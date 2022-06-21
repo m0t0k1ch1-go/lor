@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Decode(code string) (Deck, error) {
-	b, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(code)
+func Decode(deckCode string) (Deck, error) {
+	b, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(deckCode)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to base32 decode")
 	}

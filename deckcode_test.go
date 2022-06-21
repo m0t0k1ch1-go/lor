@@ -13,21 +13,21 @@ import (
 )
 
 type testCase struct {
-	Code string
-	Deck Deck
+	DeckCode string
+	Deck     Deck
 }
 
 func TestDecode(t *testing.T) {
 	tcs, err := loadTestCases()
 	if err != nil {
-		t.Fatalf("failed to load the test data:%v", err)
+		t.Fatalf("failed to load the test data: %v", err)
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.Code, func(t *testing.T) {
-			deck, err := Decode(tc.Code)
+		t.Run(tc.DeckCode, func(t *testing.T) {
+			deck, err := Decode(tc.DeckCode)
 			if err != nil {
-				t.Error(err)
+				t.Errorf("failed to decode the deck code: %v", err)
 				return
 			}
 			if diff := cmp.Diff(tc.Deck, deck, cmp.Transformer("sort", func(in Deck) Deck {
@@ -67,7 +67,7 @@ func loadTestCases() ([]testCase, error) {
 		}
 
 		if startsNewDeck {
-			tc.Code = row
+			tc.DeckCode = row
 			startsNewDeck = false
 			continue
 		}
