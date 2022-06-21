@@ -25,7 +25,7 @@ func Decode(code string) (Deck, error) {
 	// format := formatAndVersionByte >> 4
 	version := formatAndVersionByte & 0xf
 
-	if version > MaxKnownVersion {
+	if uint64(version) > MaxKnownVersion {
 		return nil, ErrUnknownVersion
 	}
 

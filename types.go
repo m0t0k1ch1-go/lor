@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	MaxKnownVersion uint8  = 5
+	MaxKnownVersion uint64 = 5
 	MaxKnownSet     uint64 = 6
 	MaxCardNumber   uint64 = 999
 )
