@@ -18,7 +18,7 @@ var (
 )
 
 var (
-	factionsMap = map[uint64]string{
+	factionMap = map[uint64]string{
 		0:  "DE",
 		1:  "FR",
 		2:  "IO",
