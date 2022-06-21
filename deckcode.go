@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base32"
 	"encoding/binary"
+	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -48,10 +49,18 @@ func Decode(code string) (Deck, error) {
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to read the uvarint representing the set")
 			}
+			if set > MaxKnownSet {
+				return nil, ErrUnknownSet
+			}
 
 			faction, err := binary.ReadUvarint(buf)
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to read the uvarint representing the faction")
+			}
+
+			factionIdentifier, ok := factionsMap[faction]
+			if !ok {
+				return nil, ErrUnknownFaction
 			}
 
 			var k uint64
@@ -60,14 +69,13 @@ func Decode(code string) (Deck, error) {
 				if err != nil {
 					return nil, errors.Wrap(err, "failed to read the uvarint representing the card number")
 				}
+				if cardNumber > MaxCardNumber {
+					return nil, ErrUnexpectedCardNumber
+				}
 
 				deck = append(deck, CardCodeAndCount{
-					CardCode: CardCode{
-						Set:        set,
-						Faction:    Faction(faction),
-						CardNumber: cardNumber,
-					},
-					Count: i,
+					CardCode: fmt.Sprintf("%02d%s%03d", set, factionIdentifier, cardNumber),
+					Count:    i,
 				})
 			}
 		}
