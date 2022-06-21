@@ -58,7 +58,7 @@ func Decode(deckCode string) (Deck, error) {
 				return nil, errors.Wrap(err, "failed to read the uvarint representing the faction")
 			}
 
-			factionIdentifier, ok := factionMap[faction]
+			factionIdentifier, ok := uint64ToFactionIdentifier[faction]
 			if !ok {
 				return nil, ErrUnknownFaction
 			}
