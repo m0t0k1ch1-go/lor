@@ -77,22 +77,16 @@ func Encode(deck Deck) (string, error) {
 			groups = append(groups, group)
 		}
 
+		sort.Slice(groups, func(i, j int) bool {
+			return len(groups[i]) < len(groups[j])
+		})
+
 		return groups
 	}
 
 	groups3 := newGroups(of3)
 	groups2 := newGroups(of2)
 	groups1 := newGroups(of1)
-
-	sortGroups := func(groups [][]CardCodeAndCount) {
-		sort.Slice(groups, func(i, j int) bool {
-			return len(groups[i]) < len(groups[j])
-		})
-	}
-
-	sortGroups(groups3)
-	sortGroups(groups2)
-	sortGroups(groups1)
 
 	encodeGroups := func(groups [][]CardCodeAndCount) error {
 		if err := writeUvarint(buf, uint64(len(groups))); err != nil {
@@ -237,9 +231,9 @@ func getMinSupportedVersion(deck Deck) (uint8, error) {
 	}
 
 	minSupportedVersion := InitialVersion
+
 	for _, cardCodeAndCount := range deck {
-		factionIdentifier := cardCodeAndCount.CardCode[2:4]
-		version, ok := factionIdentifierToVersion[factionIdentifier]
+		version, ok := factionIdentifierToVersion[cardCodeAndCount.CardCode[2:4]]
 		if !ok {
 			return 0, ErrUnknownFaction
 		}

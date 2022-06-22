@@ -5,12 +5,12 @@ import (
 )
 
 const (
-	Format         uint8 = 1
-	InitialVersion uint8 = 1
+	Format          uint8 = 1
+	InitialVersion  uint8 = 1
+	MaxKnownVersion uint8 = 5
 
-	MaxKnownVersion uint8  = 5
-	MaxKnownSet     uint64 = 6
-	MaxCardNumber   uint64 = 999
+	MaxKnownSet   uint64 = 6
+	MaxCardNumber uint64 = 999
 
 	CardCodeLength int = 7
 )
