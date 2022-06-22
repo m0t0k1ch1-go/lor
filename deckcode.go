@@ -144,13 +144,13 @@ func Encode(deck Deck) (string, error) {
 	}
 
 	if err := encodeGroups(groups3); err != nil {
-		return "", errors.Wrap(err, "failed to encode groups 3")
+		return "", errors.Wrap(err, "failed to encode the groups 3")
 	}
 	if err := encodeGroups(groups2); err != nil {
-		return "", errors.Wrap(err, "failed to encode groups 2")
+		return "", errors.Wrap(err, "failed to encode the groups 2")
 	}
 	if err := encodeGroups(groups1); err != nil {
-		return "", errors.Wrap(err, "failed to encode groups 1")
+		return "", errors.Wrap(err, "failed to encode the groups 1")
 	}
 
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf.Bytes()), nil
