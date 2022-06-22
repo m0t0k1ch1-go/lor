@@ -31,7 +31,7 @@ func TestDecode(t *testing.T) {
 				return
 			}
 			if diff := cmp.Diff(tc.Deck, deck, cmp.Transformer("sort", func(in Deck) Deck {
-				out := append(Deck(nil), in...)
+				out := append(Deck{}, in...)
 				sort.Slice(out, func(i, j int) bool {
 					return out[i].CardCode < out[j].CardCode
 				})
@@ -76,18 +76,18 @@ func loadTestCases() ([]testCase, error) {
 		if len(parts) != 2 {
 			return nil, errors.New("malformed row")
 		}
-		if len(parts[1]) != 7 {
+		if len(parts[1]) != CardCodeLength {
 			return nil, errors.New("malformed card code")
 		}
 
-		cardCount, err := strconv.Atoi(parts[0])
+		cardCount, err := strconv.ParseUint(parts[0], 10, 64)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse the card count")
 		}
 
 		tc.Deck = append(tc.Deck, CardCodeAndCount{
 			CardCode: parts[1],
-			Count:    uint64(cardCount),
+			Count:    cardCount,
 		})
 	}
 	if err := scanner.Err(); err != nil {
