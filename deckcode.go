@@ -44,14 +44,26 @@ func Encode(deck Deck) (string, error) {
 	}
 
 	newGroups := func(ofX []CardCodeAndCount) [][]CardCodeAndCount {
+		sort.Slice(ofX, func(i, j int) bool {
+			return ofX[i].CardCode < ofX[j].CardCode
+		})
+
 		groups := [][]CardCodeAndCount{}
 
 		for len(ofX) > 0 {
 			firstCardCodeAndCount := ofX[0]
+			group := []CardCodeAndCount{
+				firstCardCodeAndCount,
+			}
+
+			if len(ofX) == 1 {
+				groups = append(groups, group)
+				break
+			}
+
 			restOfX := ofX[1:]
 			ofX = nil
 
-			group := []CardCodeAndCount{}
 			groupCode := firstCardCodeAndCount.CardCode[:4]
 
 			for _, cardCodeAndCount := range restOfX {
@@ -68,9 +80,9 @@ func Encode(deck Deck) (string, error) {
 		return groups
 	}
 
-	groupsOf3 := newGroups(of3)
-	groupsOf2 := newGroups(of2)
-	groupsOf1 := newGroups(of1)
+	groups3 := newGroups(of3)
+	groups2 := newGroups(of2)
+	groups1 := newGroups(of1)
 
 	sortGroups := func(groups [][]CardCodeAndCount) {
 		sort.Slice(groups, func(i, j int) bool {
@@ -84,9 +96,9 @@ func Encode(deck Deck) (string, error) {
 		}
 	}
 
-	sortGroups(groupsOf3)
-	sortGroups(groupsOf2)
-	sortGroups(groupsOf1)
+	sortGroups(groups3)
+	sortGroups(groups2)
+	sortGroups(groups1)
 
 	encodeGroups := func(groups [][]CardCodeAndCount) error {
 		if err := writeUvarint(buf, uint64(len(groups))); err != nil {
@@ -137,17 +149,17 @@ func Encode(deck Deck) (string, error) {
 		return nil
 	}
 
-	if err := encodeGroups(groupsOf3); err != nil {
-		return "", errors.Wrap(err, "failed to encode groups of 3")
+	if err := encodeGroups(groups3); err != nil {
+		return "", errors.Wrap(err, "failed to encode groups 3")
 	}
-	if err := encodeGroups(groupsOf2); err != nil {
-		return "", errors.Wrap(err, "failed to encode groups of 2")
+	if err := encodeGroups(groups2); err != nil {
+		return "", errors.Wrap(err, "failed to encode groups 2")
 	}
-	if err := encodeGroups(groupsOf1); err != nil {
-		return "", errors.Wrap(err, "failed to encode groups of 1")
+	if err := encodeGroups(groups1); err != nil {
+		return "", errors.Wrap(err, "failed to encode groups 1")
 	}
 
-	return base32.StdEncoding.EncodeToString(buf.Bytes()), nil
+	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf.Bytes()), nil
 }
 
 func Decode(deckCode string) (Deck, error) {
