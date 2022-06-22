@@ -43,107 +43,17 @@ func Encode(deck Deck) (string, error) {
 		}
 	}
 
-	newGroups := func(ofX []CardCodeAndCount) [][]CardCodeAndCount {
-		sort.Slice(ofX, func(i, j int) bool {
-			return ofX[i].CardCode < ofX[j].CardCode
-		})
+	groups3 := newSortedGroups(of3)
+	groups2 := newSortedGroups(of2)
+	groups1 := newSortedGroups(of1)
 
-		groups := [][]CardCodeAndCount{}
-
-		for len(ofX) > 0 {
-			firstCardCodeAndCount := ofX[0]
-			group := []CardCodeAndCount{
-				firstCardCodeAndCount,
-			}
-
-			if len(ofX) == 1 {
-				groups = append(groups, group)
-				break
-			}
-
-			restOfX := ofX[1:]
-			ofX = nil
-
-			groupCode := firstCardCodeAndCount.CardCode[:4]
-
-			for _, cardCodeAndCount := range restOfX {
-				if cardCodeAndCount.CardCode[:4] == groupCode {
-					group = append(group, cardCodeAndCount)
-				} else {
-					ofX = append(ofX, cardCodeAndCount)
-				}
-			}
-
-			groups = append(groups, group)
-		}
-
-		sort.Slice(groups, func(i, j int) bool {
-			return len(groups[i]) < len(groups[j])
-		})
-
-		return groups
-	}
-
-	groups3 := newGroups(of3)
-	groups2 := newGroups(of2)
-	groups1 := newGroups(of1)
-
-	encodeGroups := func(groups [][]CardCodeAndCount) error {
-		if err := writeUvarint(buf, uint64(len(groups))); err != nil {
-			return errors.Wrap(err, "failed to write the uvarint representing the number of groups")
-		}
-
-		for _, group := range groups {
-			if err := writeUvarint(buf, uint64(len(group))); err != nil {
-				return errors.Wrap(err, "failed to write the uvarint representing the number of card numbers")
-			}
-
-			set, err := strconv.ParseUint(group[0].CardCode[:2], 10, 64)
-			if err != nil {
-				return errors.Wrap(err, "failed to parse the set")
-			}
-			if set > MaxKnownSet {
-				return ErrUnknownSet
-			}
-
-			faction, ok := factionIdentifierToUint64[group[0].CardCode[2:4]]
-			if !ok {
-				return ErrUnknownFaction
-			}
-
-			if err := writeUvarint(buf, set); err != nil {
-				return errors.Wrap(err, "failed to write the uvarint representing the set")
-			}
-			if err := writeUvarint(buf, faction); err != nil {
-				return errors.Wrap(err, "failed to write the uvarint representing the faction")
-			}
-
-			for _, cardCodeAndCount := range group {
-				if len(cardCodeAndCount.CardCode) != CardCodeLength {
-					return ErrUnexpectedCardCodeLength
-				}
-
-				cardNumber, err := strconv.ParseUint(cardCodeAndCount.CardCode[4:], 10, 64)
-				if err != nil {
-					return errors.Wrap(err, "failed to parse the card number")
-				}
-
-				if err := writeUvarint(buf, cardNumber); err != nil {
-					return errors.Wrap(err, "failed to write the uvarint representing the card number")
-				}
-			}
-		}
-
-		return nil
-	}
-
-	if err := encodeGroups(groups3); err != nil {
+	if err := encodeGroups(buf, groups3); err != nil {
 		return "", errors.Wrap(err, "failed to encode the groups 3")
 	}
-	if err := encodeGroups(groups2); err != nil {
+	if err := encodeGroups(buf, groups2); err != nil {
 		return "", errors.Wrap(err, "failed to encode the groups 2")
 	}
-	if err := encodeGroups(groups1); err != nil {
+	if err := encodeGroups(buf, groups1); err != nil {
 		return "", errors.Wrap(err, "failed to encode the groups 1")
 	}
 
@@ -244,6 +154,96 @@ func getMinSupportedVersion(deck Deck) (uint8, error) {
 	}
 
 	return minSupportedVersion, nil
+}
+
+func newSortedGroups(ofX []CardCodeAndCount) [][]CardCodeAndCount {
+	sort.Slice(ofX, func(i, j int) bool {
+		return ofX[i].CardCode < ofX[j].CardCode
+	})
+
+	groups := [][]CardCodeAndCount{}
+
+	for len(ofX) > 0 {
+		firstCardCodeAndCount := ofX[0]
+		group := []CardCodeAndCount{
+			firstCardCodeAndCount,
+		}
+
+		if len(ofX) == 1 {
+			groups = append(groups, group)
+			break
+		}
+
+		restOfX := ofX[1:]
+		ofX = nil
+
+		groupCode := firstCardCodeAndCount.CardCode[:4]
+
+		for _, cardCodeAndCount := range restOfX {
+			if cardCodeAndCount.CardCode[:4] == groupCode {
+				group = append(group, cardCodeAndCount)
+			} else {
+				ofX = append(ofX, cardCodeAndCount)
+			}
+		}
+
+		groups = append(groups, group)
+	}
+
+	sort.Slice(groups, func(i, j int) bool {
+		return len(groups[i]) < len(groups[j])
+	})
+
+	return groups
+}
+
+func encodeGroups(w io.Writer, groups [][]CardCodeAndCount) error {
+	if err := writeUvarint(w, uint64(len(groups))); err != nil {
+		return errors.Wrap(err, "failed to write the uvarint representing the number of groups")
+	}
+
+	for _, group := range groups {
+		if err := writeUvarint(w, uint64(len(group))); err != nil {
+			return errors.Wrap(err, "failed to write the uvarint representing the number of card numbers")
+		}
+
+		set, err := strconv.ParseUint(group[0].CardCode[:2], 10, 64)
+		if err != nil {
+			return errors.Wrap(err, "failed to parse the set")
+		}
+		if set > MaxKnownSet {
+			return ErrUnknownSet
+		}
+
+		faction, ok := factionIdentifierToUint64[group[0].CardCode[2:4]]
+		if !ok {
+			return ErrUnknownFaction
+		}
+
+		if err := writeUvarint(w, set); err != nil {
+			return errors.Wrap(err, "failed to write the uvarint representing the set")
+		}
+		if err := writeUvarint(w, faction); err != nil {
+			return errors.Wrap(err, "failed to write the uvarint representing the faction")
+		}
+
+		for _, cardCodeAndCount := range group {
+			if len(cardCodeAndCount.CardCode) != CardCodeLength {
+				return ErrUnexpectedCardCodeLength
+			}
+
+			cardNumber, err := strconv.ParseUint(cardCodeAndCount.CardCode[4:], 10, 64)
+			if err != nil {
+				return errors.Wrap(err, "failed to parse the card number")
+			}
+
+			if err := writeUvarint(w, cardNumber); err != nil {
+				return errors.Wrap(err, "failed to write the uvarint representing the card number")
+			}
+		}
+	}
+
+	return nil
 }
 
 func writeUvarint(w io.Writer, x uint64) (err error) {
