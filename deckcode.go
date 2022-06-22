@@ -17,7 +17,7 @@ func Encode(deck Deck) (string, error) {
 
 	version, err := getMinSupportedVersion(deck)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get min supported version")
+		return "", errors.Wrap(err, "failed to get the min supported version")
 	}
 
 	formatAndVersionByte := Format<<4 | version
