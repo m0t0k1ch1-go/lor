@@ -88,12 +88,6 @@ func Encode(deck Deck) (string, error) {
 		sort.Slice(groups, func(i, j int) bool {
 			return len(groups[i]) < len(groups[j])
 		})
-
-		for _, group := range groups {
-			sort.Slice(group, func(i, j int) bool {
-				return group[i].CardCode < group[j].CardCode
-			})
-		}
 	}
 
 	sortGroups(groups3)
