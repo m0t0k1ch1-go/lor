@@ -17,6 +17,26 @@ type testCase struct {
 	Deck     Deck
 }
 
+func TestEncode(t *testing.T) {
+	tcs, err := loadTestCases()
+	if err != nil {
+		t.Fatalf("failed to load the test data: %v", err)
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.DeckCode, func(t *testing.T) {
+			deckCode, err := Encode(tc.Deck)
+			if err != nil {
+				t.Errorf("failed to encode the deck: %v", err)
+				return
+			}
+			if diff := cmp.Diff(tc.DeckCode, deckCode); len(diff) > 0 {
+				t.Errorf("mismatch:\n%s", diff)
+			}
+		})
+	}
+}
+
 func TestDecode(t *testing.T) {
 	tcs, err := loadTestCases()
 	if err != nil {
