@@ -73,9 +73,12 @@ func Decode(deckCode string) (Deck, error) {
 		return nil, errors.Wrap(err, "failed to read the format and version")
 	}
 
-	// format := formatAndVersionByte >> 4
-	version := formatAndVersionByte & 0xf
+	format := formatAndVersionByte >> 4
+	if !isSupportedFormat(format) {
+		return nil, ErrUnknownFormat
+	}
 
+	version := formatAndVersionByte & 0xf
 	if version > MaxKnownVersion {
 		return nil, ErrUnknownVersion
 	}
@@ -133,6 +136,10 @@ func Decode(deckCode string) (Deck, error) {
 	}
 
 	return deck, nil
+}
+
+func isSupportedFormat(format uint8) bool {
+	return format == Format
 }
 
 func getMinSupportedVersion(deck Deck) (uint8, error) {

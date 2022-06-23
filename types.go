@@ -16,6 +16,7 @@ const (
 )
 
 var (
+	ErrUnknownFormat  = errors.New("unknown format")
 	ErrUnknownVersion = errors.New("unknown version")
 	ErrUnknownSet     = errors.New("unknown set")
 	ErrUnknownFaction = errors.New("unknown faction")
