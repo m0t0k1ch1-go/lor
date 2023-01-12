@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type testCase struct {
+type TestCase struct {
 	DeckCode string
 	Deck     Deck
 }
@@ -63,16 +63,16 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-func loadTestCases() ([]testCase, error) {
+func loadTestCases() ([]TestCase, error) {
 	f, err := os.Open("./_testdata/DeckCodesTestData.txt")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open the test data file")
 	}
 	defer f.Close()
 
-	tcs := []testCase{}
+	tcs := []TestCase{}
 
-	var tc testCase
+	var tc TestCase
 	startsNewDeck := true
 
 	scanner := bufio.NewScanner(f)
@@ -81,7 +81,7 @@ func loadTestCases() ([]testCase, error) {
 
 		if len(row) == 0 {
 			tcs = append(tcs, tc)
-			tc = testCase{}
+			tc = TestCase{}
 			startsNewDeck = true
 			continue
 		}
