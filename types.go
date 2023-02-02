@@ -1,4 +1,4 @@
-package deckcode
+package lordeckcode
 
 import (
 	"github.com/pkg/errors"
