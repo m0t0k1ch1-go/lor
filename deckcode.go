@@ -17,13 +17,13 @@ func Encode(deck Deck) (string, error) {
 
 	version, err := getMinSupportedVersion(deck)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get the min supported version")
+		return "", errors.Wrap(err, "failed to get min supported version")
 	}
 
 	formatAndVersionByte := Format<<4 | version
 
 	if err := buf.WriteByte(formatAndVersionByte); err != nil {
-		return "", errors.Wrap(err, "failed to write the format and version")
+		return "", errors.Wrap(err, "failed to write format and version")
 	}
 
 	of3 := []CardCodeAndCount{}
@@ -48,13 +48,13 @@ func Encode(deck Deck) (string, error) {
 	groups1 := newSortedGroups(of1)
 
 	if err := encodeGroups(buf, groups3); err != nil {
-		return "", errors.Wrap(err, "failed to encode the groups 3")
+		return "", errors.Wrap(err, "failed to encode groups 3")
 	}
 	if err := encodeGroups(buf, groups2); err != nil {
-		return "", errors.Wrap(err, "failed to encode the groups 2")
+		return "", errors.Wrap(err, "failed to encode groups 2")
 	}
 	if err := encodeGroups(buf, groups1); err != nil {
-		return "", errors.Wrap(err, "failed to encode the groups 1")
+		return "", errors.Wrap(err, "failed to encode groups 1")
 	}
 
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf.Bytes()), nil
@@ -70,7 +70,7 @@ func Decode(deckCode string) (Deck, error) {
 
 	formatAndVersionByte, err := buf.ReadByte()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read the format and version")
+		return nil, errors.Wrap(err, "failed to read format and version")
 	}
 
 	format := formatAndVersionByte >> 4
@@ -89,19 +89,19 @@ func Decode(deckCode string) (Deck, error) {
 	for i = 3; i > 0; i-- {
 		groupCount, err := binary.ReadUvarint(buf)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to read the uvarint representing the number of groups")
+			return nil, errors.Wrap(err, "failed to read uvarint representing number of groups")
 		}
 
 		var j uint64
 		for j = 0; j < groupCount; j++ {
 			cardNumberCount, err := binary.ReadUvarint(buf)
 			if err != nil {
-				return nil, errors.Wrap(err, "failed to read the uvarint representing the number of card numbers")
+				return nil, errors.Wrap(err, "failed to read uvarint representing number of card numbers")
 			}
 
 			set, err := binary.ReadUvarint(buf)
 			if err != nil {
-				return nil, errors.Wrap(err, "failed to read the uvarint representing the set")
+				return nil, errors.Wrap(err, "failed to read uvarint representing set")
 			}
 			if set > MaxKnownSet {
 				return nil, ErrUnknownSet
@@ -109,7 +109,7 @@ func Decode(deckCode string) (Deck, error) {
 
 			faction, err := binary.ReadUvarint(buf)
 			if err != nil {
-				return nil, errors.Wrap(err, "failed to read the uvarint representing the faction")
+				return nil, errors.Wrap(err, "failed to read uvarint representing faction")
 			}
 
 			factionIdentifier, ok := uint64ToFactionIdentifier[faction]
@@ -121,7 +121,7 @@ func Decode(deckCode string) (Deck, error) {
 			for k = 0; k < cardNumberCount; k++ {
 				cardNumber, err := binary.ReadUvarint(buf)
 				if err != nil {
-					return nil, errors.Wrap(err, "failed to read the uvarint representing the card number")
+					return nil, errors.Wrap(err, "failed to read uvarint representing card number")
 				}
 				if cardNumber > MaxCardNumber {
 					return nil, ErrUnexpectedCardNumber
@@ -206,17 +206,17 @@ func newSortedGroups(ofX []CardCodeAndCount) [][]CardCodeAndCount {
 
 func encodeGroups(w io.Writer, groups [][]CardCodeAndCount) error {
 	if err := writeUvarint(w, uint64(len(groups))); err != nil {
-		return errors.Wrap(err, "failed to write the uvarint representing the number of groups")
+		return errors.Wrap(err, "failed to write uvarint representing number of groups")
 	}
 
 	for _, group := range groups {
 		if err := writeUvarint(w, uint64(len(group))); err != nil {
-			return errors.Wrap(err, "failed to write the uvarint representing the number of card numbers")
+			return errors.Wrap(err, "failed to write uvarint representing number of card numbers")
 		}
 
 		set, err := strconv.ParseUint(group[0].CardCode[:2], 10, 64)
 		if err != nil {
-			return errors.Wrap(err, "failed to parse the set")
+			return errors.Wrap(err, "failed to parse set")
 		}
 		if set > MaxKnownSet {
 			return ErrUnknownSet
@@ -228,10 +228,10 @@ func encodeGroups(w io.Writer, groups [][]CardCodeAndCount) error {
 		}
 
 		if err := writeUvarint(w, set); err != nil {
-			return errors.Wrap(err, "failed to write the uvarint representing the set")
+			return errors.Wrap(err, "failed to write uvarint representing set")
 		}
 		if err := writeUvarint(w, faction); err != nil {
-			return errors.Wrap(err, "failed to write the uvarint representing the faction")
+			return errors.Wrap(err, "failed to write uvarint representing faction")
 		}
 
 		for _, cardCodeAndCount := range group {
@@ -241,11 +241,11 @@ func encodeGroups(w io.Writer, groups [][]CardCodeAndCount) error {
 
 			cardNumber, err := strconv.ParseUint(cardCodeAndCount.CardCode[4:], 10, 64)
 			if err != nil {
-				return errors.Wrap(err, "failed to parse the card number")
+				return errors.Wrap(err, "failed to parse card number")
 			}
 
 			if err := writeUvarint(w, cardNumber); err != nil {
-				return errors.Wrap(err, "failed to write the uvarint representing the card number")
+				return errors.Wrap(err, "failed to write uvarint representing card number")
 			}
 		}
 	}
@@ -257,6 +257,5 @@ func writeUvarint(w io.Writer, x uint64) (err error) {
 	b := make([]byte, binary.MaxVarintLen64)
 	n := binary.PutUvarint(b, x)
 	_, err = w.Write(b[:n])
-
 	return
 }
