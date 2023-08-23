@@ -64,7 +64,7 @@ func TestDecode(t *testing.T) {
 }
 
 func loadTestCases() ([]TestCase, error) {
-	f, err := os.Open("./_testdata/DeckCodesTestData.txt")
+	f, err := os.Open("./testdata/DeckCodesTestData.txt")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open the test data file")
 	}
