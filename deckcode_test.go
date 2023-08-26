@@ -20,14 +20,14 @@ type TestCase struct {
 func TestEncode(t *testing.T) {
 	tcs, err := loadTestCases()
 	if err != nil {
-		t.Fatalf("failed to load the test data: %v", err)
+		t.Fatalf("failed to load test data: %v", err)
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.DeckCode, func(t *testing.T) {
 			deckCode, err := Encode(tc.Deck)
 			if err != nil {
-				t.Errorf("failed to encode the deck: %v", err)
+				t.Errorf("failed to encode deck: %v", err)
 				return
 			}
 			if diff := cmp.Diff(tc.DeckCode, deckCode); len(diff) > 0 {
@@ -40,14 +40,14 @@ func TestEncode(t *testing.T) {
 func TestDecode(t *testing.T) {
 	tcs, err := loadTestCases()
 	if err != nil {
-		t.Fatalf("failed to load the test data: %v", err)
+		t.Fatalf("failed to load test data: %v", err)
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.DeckCode, func(t *testing.T) {
 			deck, err := Decode(tc.DeckCode)
 			if err != nil {
-				t.Errorf("failed to decode the deck code: %v", err)
+				t.Errorf("failed to decode deck code: %v", err)
 				return
 			}
 			if diff := cmp.Diff(tc.Deck, deck, cmp.Transformer("sort", func(in Deck) Deck {
@@ -66,7 +66,7 @@ func TestDecode(t *testing.T) {
 func loadTestCases() ([]TestCase, error) {
 	f, err := os.Open("./testdata/DeckCodesTestData.txt")
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open the test data file")
+		return nil, errors.Wrap(err, "failed to open test data file")
 	}
 	defer f.Close()
 
@@ -102,7 +102,7 @@ func loadTestCases() ([]TestCase, error) {
 
 		cardCount, err := strconv.ParseUint(parts[0], 10, 64)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to parse the card count")
+			return nil, errors.Wrap(err, "failed to parse card count")
 		}
 
 		tc.Deck = append(tc.Deck, CardCodeAndCount{
@@ -111,7 +111,7 @@ func loadTestCases() ([]TestCase, error) {
 		})
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, errors.Wrap(err, "failed to scan the test data file")
+		return nil, errors.Wrap(err, "failed to scan test data file")
 	}
 
 	return tcs, nil
