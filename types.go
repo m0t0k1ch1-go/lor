@@ -70,9 +70,11 @@ var (
 	}
 )
 
+// CardCodeAndCount represents a card code and count.
 type CardCodeAndCount struct {
 	CardCode string `json:"cardCode"`
 	Count    uint64 `json:"count"`
 }
 
+// Deck represents a deck.
 type Deck []CardCodeAndCount

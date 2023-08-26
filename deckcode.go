@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Encode encodes a deck to a deck code.
 func Encode(deck Deck) (string, error) {
 	buf := new(bytes.Buffer)
 
@@ -60,6 +61,7 @@ func Encode(deck Deck) (string, error) {
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf.Bytes()), nil
 }
 
+// Decode decodes a deck code to a deck.
 func Decode(deckCode string) (Deck, error) {
 	b, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(deckCode)
 	if err != nil {
