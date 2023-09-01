@@ -9,5 +9,5 @@ a [LoR](https://playruneterra.com) deck encoder/decoder for Go
 ## Installation
 
 ```sh
-$ go get -u github.com/m0t0k1ch1/lor-deckcode-go
+$ go get github.com/m0t0k1ch1/lor-deckcode-go
 ```
