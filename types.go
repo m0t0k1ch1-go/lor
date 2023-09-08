@@ -9,7 +9,7 @@ const (
 	InitialVersion  uint8 = 1
 	MaxKnownVersion uint8 = 5
 
-	MaxKnownSet   uint64 = 7
+	MaxKnownSet   uint64 = 8
 	MaxCardNumber uint64 = 999
 
 	CardCodeLength int = 7
