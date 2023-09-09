@@ -141,7 +141,7 @@ func Decode(deckCode string) (Deck, error) {
 }
 
 func isSupportedFormat(format uint8) bool {
-	return format == Format
+	return true // the original implementation does not validate the format
 }
 
 func getMinSupportedVersion(deck Deck) (uint8, error) {
