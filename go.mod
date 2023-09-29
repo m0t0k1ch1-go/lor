@@ -1,4 +1,4 @@
-module github.com/m0t0k1ch1/lor-deckcode-go
+module github.com/m0t0k1ch1-go/lor
 
 go 1.21
 

@@ -11,8 +11,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 
-	"github.com/m0t0k1ch1/lor-deckcode-go/deckcode"
-	"github.com/m0t0k1ch1/lor-deckcode-go/internal/testutil"
+	"github.com/m0t0k1ch1-go/lor/deckcode"
+	"github.com/m0t0k1ch1-go/lor/internal/testutil"
 )
 
 type TestCase struct {
