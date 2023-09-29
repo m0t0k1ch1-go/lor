@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/m0t0k1ch1/lor-deckcode-go/deckcode"
+	"github.com/m0t0k1ch1/lor-deckcode-go/internal/testutil"
 )
 
 type TestCase struct {
@@ -32,9 +33,8 @@ func TestEncode(t *testing.T) {
 				t.Errorf("failed to encode deck: %v", err)
 				return
 			}
-			if diff := cmp.Diff(tc.DeckCode, deckCode); len(diff) > 0 {
-				t.Errorf("mismatch:\n%s", diff)
-			}
+
+			testutil.Equal(t, tc.DeckCode, deckCode)
 		})
 	}
 }
@@ -52,15 +52,15 @@ func TestDecode(t *testing.T) {
 				t.Errorf("failed to decode deck code: %v", err)
 				return
 			}
-			if diff := cmp.Diff(tc.Deck, deck, cmp.Transformer("sort", func(in deckcode.Deck) deckcode.Deck {
+
+			testutil.Equal(t, tc.Deck, deck, cmp.Transformer("sort", func(in deckcode.Deck) deckcode.Deck {
 				out := append(deckcode.Deck{}, in...)
 				sort.Slice(out, func(i, j int) bool {
 					return out[i].CardCode < out[j].CardCode
 				})
+
 				return out
-			})); len(diff) > 0 {
-				t.Errorf("mismatch:\n%s", diff)
-			}
+			}))
 		})
 	}
 }
