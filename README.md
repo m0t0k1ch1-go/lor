@@ -1,13 +1,13 @@
-# lor-deckcode-go
+# lor
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/m0t0k1ch1/lor-deckcode-go)](https://goreportcard.com/report/github.com/m0t0k1ch1/lor-deckcode-go)
-[![Go Reference](https://pkg.go.dev/badge/github.com/m0t0k1ch1/lor-deckcode-go.svg)](https://pkg.go.dev/github.com/m0t0k1ch1/lor-deckcode-go)
-[![Test](https://github.com/m0t0k1ch1/lor-deckcode-go/actions/workflows/test.yaml/badge.svg)](https://github.com/m0t0k1ch1/lor-deckcode-go/actions/workflows/test.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/m0t0k1ch1-go/lor)](https://goreportcard.com/report/github.com/m0t0k1ch1-go/lor)
+[![Go Reference](https://pkg.go.dev/badge/github.com/m0t0k1ch1-go/lor.svg)](https://pkg.go.dev/github.com/m0t0k1ch1-go/lor)
+[![Test](https://github.com/m0t0k1ch1-go/lor/actions/workflows/test.yaml/badge.svg)](https://github.com/m0t0k1ch1-go/lor/actions/workflows/test.yaml)
 
-a [LoR](https://playruneterra.com) deck encoder/decoder for Go
+miscellaneous tools for [LoR](https://playruneterra.com)
 
 ## Installation
 
-```sh
-go get github.com/m0t0k1ch1/lor-deckcode-go
+```
+go get github.com/m0t0k1ch1-go/lor
 ```

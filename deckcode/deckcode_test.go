@@ -1,4 +1,4 @@
-package lordeckcode
+package deckcode
 
 import (
 	"bufio"
