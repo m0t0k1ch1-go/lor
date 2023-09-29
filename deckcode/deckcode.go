@@ -35,6 +35,8 @@ var (
 )
 
 var (
+	base32Encoding = base32.StdEncoding.WithPadding(base32.NoPadding)
+
 	factionIdentifierToVersion = map[string]uint8{
 		"DE": 1,
 		"FR": 1,
@@ -149,12 +151,12 @@ func Encode(deck Deck) (string, error) {
 		return "", errors.Wrap(err, "failed to encode groups 1")
 	}
 
-	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf.Bytes()), nil
+	return base32Encoding.EncodeToString(buf.Bytes()), nil
 }
 
 // Decode decodes a deck code to a deck.
 func Decode(deckCode string) (Deck, error) {
-	b, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(deckCode)
+	b, err := base32Encoding.DecodeString(deckCode)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to base32 decode")
 	}
