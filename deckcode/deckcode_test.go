@@ -1,4 +1,4 @@
-package deckcode
+package deckcode_test
 
 import (
 	"bufio"
@@ -10,11 +10,13 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
+
+	"github.com/m0t0k1ch1/lor-deckcode-go/deckcode"
 )
 
 type TestCase struct {
 	DeckCode string
-	Deck     Deck
+	Deck     deckcode.Deck
 }
 
 func TestEncode(t *testing.T) {
@@ -25,7 +27,7 @@ func TestEncode(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.DeckCode, func(t *testing.T) {
-			deckCode, err := Encode(tc.Deck)
+			deckCode, err := deckcode.Encode(tc.Deck)
 			if err != nil {
 				t.Errorf("failed to encode deck: %v", err)
 				return
@@ -45,13 +47,13 @@ func TestDecode(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.DeckCode, func(t *testing.T) {
-			deck, err := Decode(tc.DeckCode)
+			deck, err := deckcode.Decode(tc.DeckCode)
 			if err != nil {
 				t.Errorf("failed to decode deck code: %v", err)
 				return
 			}
-			if diff := cmp.Diff(tc.Deck, deck, cmp.Transformer("sort", func(in Deck) Deck {
-				out := append(Deck{}, in...)
+			if diff := cmp.Diff(tc.Deck, deck, cmp.Transformer("sort", func(in deckcode.Deck) deckcode.Deck {
+				out := append(deckcode.Deck{}, in...)
 				sort.Slice(out, func(i, j int) bool {
 					return out[i].CardCode < out[j].CardCode
 				})
@@ -64,7 +66,7 @@ func TestDecode(t *testing.T) {
 }
 
 func loadTestCases() ([]TestCase, error) {
-	f, err := os.Open("./testdata/DeckCodesTestData.txt")
+	f, err := os.Open("../testdata/DeckCodesTestData.txt")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open test data file")
 	}
@@ -96,7 +98,7 @@ func loadTestCases() ([]TestCase, error) {
 		if len(parts) != 2 {
 			return nil, errors.New("malformed row")
 		}
-		if len(parts[1]) != CardCodeLength {
+		if len(parts[1]) != deckcode.CardCodeLength {
 			return nil, errors.New("malformed card code")
 		}
 
@@ -105,7 +107,7 @@ func loadTestCases() ([]TestCase, error) {
 			return nil, errors.Wrap(err, "failed to parse card count")
 		}
 
-		tc.Deck = append(tc.Deck, CardCodeAndCount{
+		tc.Deck = append(tc.Deck, deckcode.CardCodeAndCount{
 			CardCode: parts[1],
 			Count:    cardCount,
 		})
