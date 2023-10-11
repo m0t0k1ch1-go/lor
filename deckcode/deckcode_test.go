@@ -15,9 +15,9 @@ import (
 	"github.com/m0t0k1ch1-go/lor/internal/testutil"
 )
 
-type TestCase struct {
-	DeckCode string
-	Deck     deckcode.Deck
+type testCase struct {
+	deckCode string
+	deck     deckcode.Deck
 }
 
 func TestEncode(t *testing.T) {
@@ -27,14 +27,14 @@ func TestEncode(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.DeckCode, func(t *testing.T) {
-			deckCode, err := deckcode.Encode(tc.Deck)
+		t.Run(tc.deckCode, func(t *testing.T) {
+			deckCode, err := deckcode.Encode(tc.deck)
 			if err != nil {
 				t.Errorf("failed to encode deck: %v", err)
 				return
 			}
 
-			testutil.Equal(t, tc.DeckCode, deckCode)
+			testutil.Equal(t, tc.deckCode, deckCode)
 		})
 	}
 }
@@ -46,14 +46,14 @@ func TestDecode(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.DeckCode, func(t *testing.T) {
-			deck, err := deckcode.Decode(tc.DeckCode)
+		t.Run(tc.deckCode, func(t *testing.T) {
+			deck, err := deckcode.Decode(tc.deckCode)
 			if err != nil {
 				t.Errorf("failed to decode deck code: %v", err)
 				return
 			}
 
-			testutil.Equal(t, tc.Deck, deck, cmp.Transformer("sort", func(in deckcode.Deck) deckcode.Deck {
+			testutil.Equal(t, tc.deck, deck, cmp.Transformer("sort", func(in deckcode.Deck) deckcode.Deck {
 				out := append(deckcode.Deck{}, in...)
 				sort.Slice(out, func(i, j int) bool {
 					return out[i].CardCode < out[j].CardCode
@@ -65,16 +65,16 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-func loadTestCases() ([]TestCase, error) {
+func loadTestCases() ([]testCase, error) {
 	f, err := os.Open("../testdata/DeckCodesTestData.txt")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open test data file")
 	}
 	defer f.Close()
 
-	tcs := []TestCase{}
+	tcs := []testCase{}
 
-	var tc TestCase
+	var tc testCase
 	startsNewDeck := true
 
 	scanner := bufio.NewScanner(f)
@@ -83,13 +83,13 @@ func loadTestCases() ([]TestCase, error) {
 
 		if len(row) == 0 {
 			tcs = append(tcs, tc)
-			tc = TestCase{}
+			tc = testCase{}
 			startsNewDeck = true
 			continue
 		}
 
 		if startsNewDeck {
-			tc.DeckCode = row
+			tc.deckCode = row
 			startsNewDeck = false
 			continue
 		}
@@ -107,7 +107,7 @@ func loadTestCases() ([]TestCase, error) {
 			return nil, errors.Wrap(err, "failed to parse card count")
 		}
 
-		tc.Deck = append(tc.Deck, deckcode.CardCodeAndCount{
+		tc.deck = append(tc.deck, deckcode.CardCodeAndCount{
 			CardCode: parts[1],
 			Count:    cardCount,
 		})
