@@ -16,6 +16,7 @@ import (
 )
 
 type testCase struct {
+	name     string
 	deckCode string
 	deck     deckcode.Deck
 }
@@ -27,7 +28,7 @@ func TestEncode(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.deckCode, func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			deckCode, err := deckcode.Encode(tc.deck)
 			if err != nil {
 				t.Errorf("failed to encode deck: %v", err)
@@ -46,7 +47,7 @@ func TestDecode(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.deckCode, func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			deck, err := deckcode.Decode(tc.deckCode)
 			if err != nil {
 				t.Errorf("failed to decode deck code: %v", err)
@@ -89,6 +90,7 @@ func loadTestCases() ([]testCase, error) {
 		}
 
 		if startsNewDeck {
+			tc.name = row
 			tc.deckCode = row
 			startsNewDeck = false
 			continue
