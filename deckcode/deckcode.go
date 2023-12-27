@@ -35,6 +35,8 @@ var (
 )
 
 var (
+	base32Encoding = base32.StdEncoding.WithPadding(base32.NoPadding)
+
 	factionIdentifierToVersion = map[string]uint8{
 		"DE": 1,
 		"FR": 1,
@@ -84,21 +86,37 @@ type CardCodeAndCount struct {
 	Count    uint64 `json:"count"`
 }
 
+func (cardCodeAndCount CardCodeAndCount) version() uint8 {
+	version, ok := factionIdentifierToVersion[cardCodeAndCount.CardCode[2:4]]
+	if !ok {
+		return 0
+	}
+
+	return version
+}
+
 // Deck represents a deck.
 type Deck []CardCodeAndCount
+
+func (deck Deck) maxVersion() uint8 {
+	if len(deck) == 0 {
+		return InitialVersion
+	}
+
+	maxVersion := InitialVersion
+
+	for _, cardCodeAndCount := range deck {
+		maxVersion = max(cardCodeAndCount.version(), maxVersion)
+	}
+
+	return maxVersion
+}
 
 // Encode encodes a deck to a deck code.
 func Encode(deck Deck) (string, error) {
 	buf := new(bytes.Buffer)
 
-	version, err := getMinSupportedVersion(deck)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to get min supported version")
-	}
-
-	formatAndVersionByte := Format<<4 | version
-
-	if err := buf.WriteByte(formatAndVersionByte); err != nil {
+	if err := buf.WriteByte(Format<<4 | deck.maxVersion()); err != nil {
 		return "", errors.Wrap(err, "failed to write format and version")
 	}
 
@@ -133,12 +151,12 @@ func Encode(deck Deck) (string, error) {
 		return "", errors.Wrap(err, "failed to encode groups 1")
 	}
 
-	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buf.Bytes()), nil
+	return base32Encoding.EncodeToString(buf.Bytes()), nil
 }
 
 // Decode decodes a deck code to a deck.
 func Decode(deckCode string) (Deck, error) {
-	b, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(deckCode)
+	b, err := base32Encoding.DecodeString(deckCode)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to base32 decode")
 	}
@@ -211,27 +229,6 @@ func Decode(deckCode string) (Deck, error) {
 	}
 
 	return deck, nil
-}
-
-func getMinSupportedVersion(deck Deck) (uint8, error) {
-	if len(deck) == 0 {
-		return InitialVersion, nil
-	}
-
-	minSupportedVersion := InitialVersion
-
-	for _, cardCodeAndCount := range deck {
-		version, ok := factionIdentifierToVersion[cardCodeAndCount.CardCode[2:4]]
-		if !ok {
-			return 0, ErrUnknownFaction
-		}
-
-		if version > minSupportedVersion {
-			minSupportedVersion = version
-		}
-	}
-
-	return minSupportedVersion, nil
 }
 
 func newSortedGroups(ofX []CardCodeAndCount) [][]CardCodeAndCount {
